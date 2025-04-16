@@ -3,6 +3,7 @@ import './App.css'
 import ScrollButton from './components/ScrollButton'
 import ThemeToggle from './components/ThemeToggle'
 import Card from './components/Card'
+import FileConverter from './components/FileConverter'
 
 function App() {
   return (
@@ -23,6 +24,10 @@ function App() {
         <div className="cards-container">
           <Card className="scroll-card">
             <ScrollButton />
+          </Card>
+          <Card className="file-card">
+            <h2>文件轉換</h2>
+            <FileConverter />
           </Card>
           {/* 可以在这里添加更多卡片 */}
         </div>
