@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "页面滚动扩展",
+  "name": "QK 服飾工具包",
   "version": "1.0",
   "description": "一个能够将页面滚动到底部的 Chrome 扩展",
   "action": {
@@ -21,7 +21,8 @@
   "permissions": [
     "sidePanel",
     "scripting",
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -29,5 +30,18 @@
   "background": {
     "service_worker": "background.js",
     "type": "module"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["logo.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 } 

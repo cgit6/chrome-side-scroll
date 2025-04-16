@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import './App.css'
 import ScrollButton from './components/ScrollButton'
+import ThemeToggle from './components/ThemeToggle'
+import Card from './components/Card'
 
 function App() {
   return (
@@ -10,15 +12,20 @@ function App() {
       <nav className="app-navbar">
         <div className="navbar-brand">
           <img src="/logo.png" className="navbar-logo" alt="Logo" />
-          <h1>KQ 服飾</h1>
+          <h1>KQ 服飾工具包</h1>
         </div>
         <div className="navbar-actions">
-          {/* 预留未来可能添加的导航选项 */}
+          <ThemeToggle />
         </div>
       </nav>
       
       <main className="app-main">
-        <ScrollButton />
+        <div className="cards-container">
+          <Card className="scroll-card">
+            <ScrollButton />
+          </Card>
+          {/* 可以在这里添加更多卡片 */}
+        </div>
       </main>
       
       <footer className="app-footer">
