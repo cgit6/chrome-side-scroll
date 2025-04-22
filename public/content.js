@@ -68,29 +68,131 @@ function removeOverlay() {
 // 立即初始化内容脚本
 console.log('内容脚本已加载在: ' + window.location.href);
 
-// 添加全局错误处理
-window.addEventListener('error', (event) => {
-  console.error('内容脚本捕获到错误:', event.error);
-});
-
-// 监听页面刷新或关闭事件
-window.addEventListener('beforeunload', () => {
-  console.log('页面即将刷新或关闭');
-  // 通知扩展程序页面即将刷新或关闭
-  try {
-    chrome.runtime.sendMessage({ action: 'pageRefresh' })
-      .catch(error => console.log('页面刷新通知发送失败，可能是正常的连接断开'));
-  } catch (error) {
-    console.log('发送刷新通知失败:', error);
-  }
+// 全局错误处理器
+window.addEventListener('error', function(event) {
+  // 创建错误对象
+  const errorData = {
+    message: event.message || '未知错误',
+    source: event.filename || window.location.href,
+    line: event.lineno,
+    column: event.colno,
+    stack: event.error ? event.error.stack : null,
+    timestamp: Date.now(),
+    type: 'runtime' // 运行时错误
+  };
   
-  // 尝试立即移除遮罩
-  removeOverlay();
+  // 发送错误到后台脚本
+  sendErrorToBackground(errorData);
+  
+  // 不阻止默认错误处理
+  return false;
+}, true);
+
+// 处理未捕获的Promise异常
+window.addEventListener('unhandledrejection', function(event) {
+  // 创建Promise错误对象
+  const errorData = {
+    message: event.reason ? (event.reason.message || '未处理的Promise拒绝') : '未处理的Promise拒绝',
+    source: window.location.href,
+    stack: event.reason && event.reason.stack ? event.reason.stack : null,
+    timestamp: Date.now(),
+    type: 'promise' // Promise错误
+  };
+  
+  // 发送错误到后台脚本
+  sendErrorToBackground(errorData);
+  
+  // 不阻止默认错误处理
+  return false;
 });
 
-// 添加全局函数以便于调试
-window.testCreateOverlay = createOverlay;
-window.testRemoveOverlay = removeOverlay;
+// 监听自定义捕获的错误
+window.addEventListener('custom-error', function(event) {
+  if (event.detail && event.detail.error) {
+    // 发送自定义错误到后台脚本
+    sendErrorToBackground({
+      ...event.detail.error,
+      timestamp: Date.now(),
+      type: 'custom' // 自定义错误
+    });
+  }
+});
+
+/**
+ * 发送错误到后台脚本
+ * @param {Object} errorData - 错误数据对象
+ */
+function sendErrorToBackground(errorData) {
+  try {
+    chrome.runtime.sendMessage({
+      action: 'logError',
+      error: errorData
+    }, function(response) {
+      if (chrome.runtime.lastError) {
+        console.error('发送错误到后台失败:', chrome.runtime.lastError);
+      }
+    });
+  } catch (error) {
+    console.error('发送错误消息失败:', error);
+  }
+}
+
+/**
+ * 手动捕获并上报错误
+ * @param {Error|string} error - 错误对象或错误消息
+ * @param {string} [source] - 错误来源
+ * @param {Object} [extraInfo] - 额外信息
+ */
+window.reportError = function(error, source, extraInfo = {}) {
+  try {
+    const errorData = {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : null,
+      source: source || window.location.href,
+      timestamp: Date.now(),
+      type: 'reported', // 手动报告的错误
+      ...extraInfo
+    };
+    
+    sendErrorToBackground(errorData);
+  } catch (e) {
+    console.error('报告错误失败:', e);
+  }
+};
+
+// 通知后台脚本页面已加载
+chrome.runtime.sendMessage({
+  action: 'pageLoaded',
+  url: window.location.href
+});
+
+// 监视页面卸载
+window.addEventListener('beforeunload', function() {
+  chrome.runtime.sendMessage({
+    action: 'pageUnloaded',
+    url: window.location.href
+  });
+});
+
+// 添加辅助函数到window对象，允许网页中的脚本直接报告错误
+window.chromeExtErrorReporter = {
+  reportError: window.reportError,
+  
+  /**
+   * 启用特定代码块的错误监控
+   * @param {Function} fn - 要执行的函数
+   * @param {string} [context] - 上下文描述
+   * @returns {*} 函数执行结果
+   */
+  tryRun: function(fn, context = '') {
+    try {
+      return fn();
+    } catch (error) {
+      this.reportError(error, context);
+      throw error; // 重新抛出错误以保持原有行为
+    }
+  }
+};
 
 // 监听来自扩展的消息
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

@@ -22,10 +22,11 @@
     "sidePanel",
     "scripting",
     "activeTab",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "host_permissions": [
-    "<all_urls>"
+      "*://jambolive.tv/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -34,7 +35,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["content-script.js"],
       "run_at": "document_end"
     }
   ],

@@ -1,0 +1,133 @@
+/* 调试测试组件样式 */
+.debug-tester {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--component-bg-light);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 1rem auto;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode .debug-tester {
+  background-color: var(--component-bg-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.debug-tester h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+body.dark-mode .debug-tester h2 {
+  color: var(--primary-dark);
+}
+
+/* 控制区域 */
+.debug-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.debug-controls button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.debug-controls button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.debug-controls button:active {
+  transform: translateY(0);
+}
+
+.debug-controls .clear-button {
+  background-color: #888;
+}
+
+.debug-controls .clear-button:hover {
+  background-color: #666;
+}
+
+/* 结果区域 */
+.debug-result {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-left: 4px solid var(--primary-color);
+}
+
+body.dark-mode .debug-result {
+  background-color: #2d3748;
+  border-left-color: var(--primary-dark);
+}
+
+.debug-result h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+body.dark-mode .debug-result h3 {
+  color: #bbb;
+}
+
+.debug-result p {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: #eee;
+  border-radius: 4px;
+  color: var(--text-light);
+  font-family: monospace;
+}
+
+body.dark-mode .debug-result p {
+  background-color: #1a202c;
+  color: var(--text-dark);
+}
+
+/* 注释区域 */
+.debug-result .note {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #ccc;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+body.dark-mode .debug-result .note {
+  border-top-color: #555;
+  color: #aaa;
+}
+
+/* 响应式适配 */
+@media (max-width: 600px) {
+  .debug-controls button {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 0;
+  }
+  
+  .debug-controls .clear-button {
+    flex: 1 1 100%;
+    margin-top: 0.5rem;
+  }
+} 
